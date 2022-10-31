@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use array2d::Array2D;
 
 fn main() {
@@ -16,7 +18,7 @@ fn part_one(input: &[String]) {
 
 fn part_two(_input: &[String]) {}
 
-fn parse(input: &[String]) -> Plane {
+fn parse(input: &[String]) -> Array2D<char> {
     let mut arr = Array2D::new(input[0].len(), input.len(), ' ');
     let mut pos = arr.positions();
     for line in input {
@@ -24,15 +26,14 @@ fn parse(input: &[String]) -> Plane {
             arr[pos.next().unwrap()] = c;
         }
     }
-    Plane {
-        z: (0),
-        array: (arr),
-    }
+    arr
 }
 
-fn amend_space(space: &mut [Plane]) {}
-
-struct Plane {
-    z: isize,
-    array: Array2D<char>,
+fn amend_space(space: &mut [Array2D<char>]) {
+    let mut new_space = Vec::new();
+    let first = &space[0];
+    for z in 0..=2 * space.len() {
+        new_space.push(Array2D::new(first.width() + 2, first.height() + 2, '.'));
+    }
+    for plane in space {}
 }
