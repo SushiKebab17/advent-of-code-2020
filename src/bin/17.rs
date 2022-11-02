@@ -1,7 +1,5 @@
 use std::collections::HashSet;
 
-use array2d::Array2D;
-
 fn main() {
     let input = advent_of_code_2020::input::input("17");
     part_one(&input);
