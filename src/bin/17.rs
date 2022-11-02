@@ -16,19 +16,19 @@ fn part_one(input: &[String]) {
 
 fn part_two(_input: &[String]) {}
 
-fn parse(input: &[String]) -> HashSet<(isize, isize, isize)> {
+fn parse(input: &[String]) -> HashSet<(i32, i32, i32)> {
     let mut active_cubes = HashSet::new();
     for (line_num, line) in input.iter().enumerate() {
         for (c_num, c) in line.chars().enumerate() {
             if c == '#' {
-                active_cubes.insert((line_num as isize, c_num as isize, 0));
+                active_cubes.insert((line_num as i32, c_num as i32, 0));
             }
         }
     }
     active_cubes
 }
 
-fn amend_space(active_cubes: &mut HashSet<(isize, isize, isize)>) {
+fn amend_space(active_cubes: &mut HashSet<(i32, i32, i32)>) {
     let mut neighbours_map = HashMap::new();
     for coord in active_cubes.iter() {
         for neighbour in get_neighbours(coord) {
@@ -38,20 +38,18 @@ fn amend_space(active_cubes: &mut HashSet<(isize, isize, isize)>) {
                 .or_insert(1);
         }
     }
-    let mut new_actives: HashSet<(isize, isize, isize)> = HashSet::new();
-    for coord in neighbours_map.keys() {
-        if active_cubes.contains(coord)
-            && (neighbours_map[coord] == 2 || neighbours_map[coord] == 3)
-        {
-            new_actives.insert(*coord);
-        } else if !active_cubes.contains(coord) && neighbours_map[coord] == 3 {
-            new_actives.insert(*coord);
+    let mut new_actives: HashSet<(i32, i32, i32)> = HashSet::new();
+    for (coord, neighbours) in neighbours_map {
+        if active_cubes.contains(&coord) && (neighbours == 2 || neighbours == 3) {
+            new_actives.insert(coord);
+        } else if neighbours == 3 {
+            new_actives.insert(coord);
         }
     }
     *active_cubes = new_actives;
 }
 
-fn get_neighbours(coord: &(isize, isize, isize)) -> [(isize, isize, isize); 26] {
+fn get_neighbours(coord: &(i32, i32, i32)) -> [(i32, i32, i32); 26] {
     let mut neighbours = [(0, 0, 0); 26];
     let mut i = 0;
     for x in -1..=1 {
