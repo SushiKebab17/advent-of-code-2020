@@ -9,31 +9,24 @@ fn main() {
 }
 
 fn part_one(input: &[String]) {
-    let mut space = Vec::new();
-    space.push(parse(input));
+    let mut active_cubes = parse(input);
     for _ in 0..6 {
-        amend_space(&mut space);
+        amend_space(&mut active_cubes);
     }
 }
 
 fn part_two(_input: &[String]) {}
 
-fn parse(input: &[String]) -> Array2D<char> {
-    let mut arr = Array2D::new(input[0].len(), input.len(), ' ');
-    let mut pos = arr.positions();
-    for line in input {
-        for c in line.chars() {
-            arr[pos.next().unwrap()] = c;
+fn parse(input: &[String]) -> HashSet<(isize, isize, isize)> {
+    let mut active_cubes = HashSet::new();
+    for (line_num, line) in input.iter().enumerate() {
+        for (c_num, c) in line.chars().enumerate() {
+            if c == '#' {
+                active_cubes.insert((line_num as isize, c_num as isize, 0));
+            }
         }
     }
-    arr
+    active_cubes
 }
 
-fn amend_space(space: &mut [Array2D<char>]) {
-    let mut new_space = Vec::new();
-    let first = &space[0];
-    for z in 0..=2 * space.len() {
-        new_space.push(Array2D::new(first.width() + 2, first.height() + 2, '.'));
-    }
-    for plane in space {}
-}
+fn amend_space(space: &mut HashSet<(isize, isize, isize)>) {}
