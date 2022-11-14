@@ -11,7 +11,7 @@ fn main() {
 fn part_one(input: &[String]) {
     let now = Instant::now();
     let (mut rules, mut lines) = parse(input);
-    let regex = make_regex(&mut rules, 0) + r"\b";
+    let regex = format!("^{}$", make_regex(&mut rules, 0));
     let re = Regex::new(&regex).unwrap();
     let mut total = 0;
     while let Some(line) = lines.next() {
@@ -42,10 +42,9 @@ fn parse(input: &[String]) -> (HashMap<u32, Rule>, Iter<String>) {
 
 fn make_regex(map: &mut HashMap<u32, Rule>, rule: u32) -> String {
     let mut regex = String::new();
-    match &map[&rule] {
+    match &map[&rule].clone() {
         Rule::Regex(c) => return c.clone(),
         Rule::SubRule(list) => {
-            let list = list.clone();
             for &sub_rule in &list[0] {
                 regex += "(";
                 regex += &make_regex(map, sub_rule);
@@ -65,6 +64,7 @@ fn make_regex(map: &mut HashMap<u32, Rule>, rule: u32) -> String {
     regex
 }
 
+#[derive(Clone)]
 enum Rule {
     SubRule(Vec<Vec<u32>>),
     Regex(String),
