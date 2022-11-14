@@ -45,10 +45,8 @@ fn parse(input: &[String]) -> (HashMap<u32, Rule>, Iter<String>) {
         } else {
             let mut patterns = Vec::new();
             for pattern in sub_rules.split(" | ") {
-                let mut sub_patterns = Vec::new();
-                for sub_pat in pattern.split(" ") {
-                    sub_patterns.push(sub_pat.parse().unwrap());
-                }
+                let sub_patterns: Vec<u32> =
+                    pattern.split(" ").map(|x| x.parse().unwrap()).collect();
                 patterns.push(sub_patterns);
             }
             Rule::SubRule(patterns)
@@ -61,8 +59,7 @@ fn parse(input: &[String]) -> (HashMap<u32, Rule>, Iter<String>) {
 
 fn make_regex(map: &HashMap<u32, Rule>, rule: u32) -> String {
     let mut regex = String::new();
-    let pattern = &map[&rule];
-    match pattern {
+    match &map[&rule] {
         Rule::Regex(c) => return c.to_string(),
         Rule::SubRule(list) => {
             for &sub_rule in &list[0] {
