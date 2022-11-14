@@ -1,6 +1,6 @@
 use core::slice::Iter;
 use regex::Regex;
-use std::collections::HashMap;
+use std::{collections::HashMap, time::Instant};
 
 fn main() {
     let input = advent_of_code_2020::input::input("19");
@@ -9,16 +9,17 @@ fn main() {
 }
 
 fn part_one(input: &[String]) {
+    let now = Instant::now();
     let (rules, mut lines) = parse(input);
     let regex = make_regex(&rules, 0) + r"\b";
     let re = Regex::new(&regex).unwrap();
-    println!("{}", re);
     let mut total = 0;
     while let Some(line) = lines.next() {
         if re.is_match(line) {
             total += 1;
         }
     }
+    println!("{}ms", now.elapsed().as_micros() as f64 / 1000.);
     println!("{}", total);
 }
 
