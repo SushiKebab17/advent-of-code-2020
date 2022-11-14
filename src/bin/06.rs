@@ -1,5 +1,3 @@
-use advent_of_code_2020::input;
-
 fn main() {
     let input = advent_of_code_2020::input::input("06");
     part_one(&input);
