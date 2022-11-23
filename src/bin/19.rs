@@ -17,7 +17,7 @@ fn part_two(input: &[String]) {
     let (mut rules, mut lines) = parse(input);
     rules.insert(8, Rule::new("42 | 42 8"));
     rules.insert(11, Rule::new("42 31 | 42 11 31"));
-    println!("{}", evaluate_total(&mut rules, &mut lines, 5));
+    println!("{}", evaluate_total(&mut rules, &mut lines, 4));
 }
 
 fn evaluate_total(rules: &mut HashMap<u32, Rule>, lines: &mut Iter<String>, depth: u32) -> u32 {
