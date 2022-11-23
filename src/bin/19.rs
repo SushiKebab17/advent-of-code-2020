@@ -1,6 +1,6 @@
 use core::slice::Iter;
 use regex::Regex;
-use std::{collections::HashMap, time::Instant};
+use std::collections::HashMap;
 
 fn main() {
     let input = advent_of_code_2020::input::input("19");
@@ -9,9 +9,19 @@ fn main() {
 }
 
 fn part_one(input: &[String]) {
-    let now = Instant::now();
     let (mut rules, mut lines) = parse(input);
-    let regex = format!("^{}$", make_regex(&mut rules, 0, 0));
+    println!("{}", evaluate_total(&mut rules, &mut lines, 0));
+}
+
+fn part_two(input: &[String]) {
+    let (mut rules, mut lines) = parse(input);
+    rules.insert(8, Rule::new("42 | 42 8"));
+    rules.insert(11, Rule::new("42 31 | 42 11 31"));
+    println!("{}", evaluate_total(&mut rules, &mut lines, 5));
+}
+
+fn evaluate_total(rules: &mut HashMap<u32, Rule>, lines: &mut Iter<String>, depth: u32) -> u32 {
+    let regex = format!("^{}$", make_regex(rules, 0, depth));
     let re = Regex::new(&regex).unwrap();
     let mut total = 0;
     while let Some(line) = lines.next() {
@@ -19,30 +29,7 @@ fn part_one(input: &[String]) {
             total += 1;
         }
     }
-    println!("{}ms", now.elapsed().as_micros() as f64 / 1000.);
-    println!("{}", total);
-}
-
-fn part_two(input: &[String]) {
-    let (mut rules, mut lines) = parse(input);
-    rules.insert(8, Rule::new("42 | 42 8"));
-    rules.insert(11, Rule::new("42 31 | 42 11 31"));
-    //let regex_list: Vec<String> = (0..8)
-    //    .map(|x| format!("^{}$", make_regex(&mut rules, 0, x)))
-    //    .collect();
-    //for r in &regex_list {
-    //    println!("{}", r.len());
-    //}
-    //let mut total = 0;
-    //while let Some(line) = lines.next() {
-    //    for regex in &regex_list {
-    //        let re = Regex::new(&regex).unwrap();
-    //        if re.is_match(line) {
-    //            total += 1;
-    //        }
-    //    }
-    //}
-    //println!("{}", total);
+    total
 }
 
 fn parse(input: &[String]) -> (HashMap<u32, Rule>, Iter<String>) {
@@ -71,11 +58,16 @@ fn make_regex(map: &mut HashMap<u32, Rule>, rule: u32, mut max_depth: u32) -> St
                 regex += ")";
             }
             if let Some(list_2) = list.get(1) {
-                regex += "|";
-                for &sub_rule in list_2 {
-                    regex += "(";
-                    regex += &make_regex(map, sub_rule, max_depth);
-                    regex += ")";
+                if !list_2.contains(&rule) || max_depth >= 1 {
+                    if max_depth >= 1 {
+                        max_depth -= 1;
+                    }
+                    regex += "|";
+                    for &sub_rule in list_2 {
+                        regex += "(";
+                        regex += &make_regex(map, sub_rule, max_depth);
+                        regex += ")";
+                    }
                 }
             }
         }
@@ -84,7 +76,7 @@ fn make_regex(map: &mut HashMap<u32, Rule>, rule: u32, mut max_depth: u32) -> St
     regex
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 enum Rule {
     SubRule(Vec<Vec<u32>>),
     Regex(String),
