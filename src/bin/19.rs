@@ -11,7 +11,7 @@ fn main() {
 fn part_one(input: &[String]) {
     let now = Instant::now();
     let (mut rules, mut lines) = parse(input);
-    let regex = format!("^{}$", make_regex(&mut rules, 0));
+    let regex = format!("^{}$", make_regex(&mut rules, 0, 0));
     let re = Regex::new(&regex).unwrap();
     let mut total = 0;
     while let Some(line) = lines.next() {
@@ -23,7 +23,27 @@ fn part_one(input: &[String]) {
     println!("{}", total);
 }
 
-fn part_two(_input: &[String]) {}
+fn part_two(input: &[String]) {
+    let (mut rules, mut lines) = parse(input);
+    rules.insert(8, Rule::new("42 | 42 8"));
+    rules.insert(11, Rule::new("42 31 | 42 11 31"));
+    //let regex_list: Vec<String> = (0..8)
+    //    .map(|x| format!("^{}$", make_regex(&mut rules, 0, x)))
+    //    .collect();
+    //for r in &regex_list {
+    //    println!("{}", r.len());
+    //}
+    //let mut total = 0;
+    //while let Some(line) = lines.next() {
+    //    for regex in &regex_list {
+    //        let re = Regex::new(&regex).unwrap();
+    //        if re.is_match(line) {
+    //            total += 1;
+    //        }
+    //    }
+    //}
+    //println!("{}", total);
+}
 
 fn parse(input: &[String]) -> (HashMap<u32, Rule>, Iter<String>) {
     let mut lines = input.iter();
@@ -40,21 +60,21 @@ fn parse(input: &[String]) -> (HashMap<u32, Rule>, Iter<String>) {
     (rules, lines)
 }
 
-fn make_regex(map: &mut HashMap<u32, Rule>, rule: u32) -> String {
+fn make_regex(map: &mut HashMap<u32, Rule>, rule: u32, mut max_depth: u32) -> String {
     let mut regex = String::new();
     match &map[&rule].clone() {
         Rule::Regex(c) => return c.clone(),
         Rule::SubRule(list) => {
             for &sub_rule in &list[0] {
                 regex += "(";
-                regex += &make_regex(map, sub_rule);
+                regex += &make_regex(map, sub_rule, max_depth);
                 regex += ")";
             }
             if let Some(list_2) = list.get(1) {
                 regex += "|";
                 for &sub_rule in list_2 {
                     regex += "(";
-                    regex += &make_regex(map, sub_rule);
+                    regex += &make_regex(map, sub_rule, max_depth);
                     regex += ")";
                 }
             }
