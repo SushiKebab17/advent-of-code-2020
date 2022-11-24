@@ -49,8 +49,8 @@ fn parse(input: &[String]) -> (HashMap<u32, Rule>, Iter<String>) {
 
 fn make_regex(map: &mut HashMap<u32, Rule>, rule: u32, mut max_depth: u32) -> String {
     let mut regex = String::new();
-    match &map[&rule].clone() {
-        Rule::Regex(c) => return c.clone(),
+    match map[&rule].clone() {
+        Rule::Regex(c) => c,
         Rule::SubRule(list) => {
             for &sub_rule in &list[0] {
                 regex += "(";
@@ -70,10 +70,10 @@ fn make_regex(map: &mut HashMap<u32, Rule>, rule: u32, mut max_depth: u32) -> St
                     }
                 }
             }
+            *map.get_mut(&rule).unwrap() = Rule::Regex(regex.clone());
+            regex
         }
     }
-    *map.get_mut(&rule).unwrap() = Rule::Regex(regex.clone());
-    regex
 }
 
 #[derive(Clone, Debug)]
@@ -84,15 +84,8 @@ enum Rule {
 
 impl Rule {
     fn new(input: &str) -> Rule {
-        if input.starts_with("\"") {
-            Rule::Regex(
-                input
-                    .strip_prefix("\"")
-                    .unwrap()
-                    .strip_suffix("\"")
-                    .unwrap()
-                    .to_string(),
-            )
+        if &input[0..=0] == "\"" {
+            Rule::Regex(String::from(&input[1..=1]))
         } else {
             let mut patterns = Vec::new();
             for pattern in input.split(" | ") {
